@@ -14,28 +14,26 @@ let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.ge
 
 // Show registration form and hide login form when "Create Account" is clicked
 document.getElementById('showRegisterButton').addEventListener('click', function() {
-    // Hide login form, leaderboard, and "Create Account" section
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('createAccountSection').style.display = 'none';
-    document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard
-    
-    // Show registration form and "Existing User? Login" button
     document.getElementById('registrationForm').classList.remove('hidden');
     document.getElementById('registrationForm').style.display = 'block';
-    document.getElementById('existingUserSection').classList.remove('hidden');
-    document.getElementById('existingUserSection').style.display = 'block';
+
+    // Ensure the leaderboard and welcome message are hidden during registration
+    document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
 // Show login form and hide registration form when "Login" button is clicked
 document.getElementById('showLoginButton').addEventListener('click', function() {
-    // Hide registration form, leaderboard, and "Existing User? Login" section
     document.getElementById('registrationForm').style.display = 'none';
     document.getElementById('existingUserSection').style.display = 'none';
-    document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard
-    
-    // Show login form and "Create Account" button
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('createAccountSection').style.display = 'block';
+
+    // Ensure the leaderboard and welcome message are hidden during login
+    document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
 
@@ -90,28 +88,26 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 });
 
 // Handle user login with "Remember Me" functionality
+// Handle user login
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const userEmail = document.getElementById('loginEmail').value;
     const userPassword = document.getElementById('loginPassword').value;
-    const rememberMe = document.getElementById('rememberMe').checked; // Get "Remember Me" status
+    const rememberMe = document.getElementById('rememberMe').checked; 
 
     try {
-        // Set persistence based on the "Remember Me" checkbox
         if (rememberMe) {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Keep user logged in across sessions
+            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
         } else {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); // Only keep logged in for the session
+            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
         }
 
-        // Sign in the user
         const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
         const user = userCredential.user;
 
         console.log('User logged in successfully');
 
-        // Fetch user streak from Firestore and show welcome message
         const userDoc = await getDoc(doc(db, 'users', userEmail));
         if (userDoc.exists()) {
             const userData = userDoc.data();
@@ -119,10 +115,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
             localStorage.setItem('userEmail', userEmail);
 
-            // Show welcome message and leaderboard
+            // Hide login form and show welcome message and leaderboard
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
-            document.getElementById('welcomeMessage').classList.remove('hidden');
+            document.getElementById('createAccountSection').style.display = 'none';
+            document.getElementById('welcomeMessage').classList.remove('hidden'); // Show welcome message
             document.getElementById('leaderboard').classList.remove('hidden'); // Show leaderboard
             document.getElementById('logoutButton').classList.remove('hidden');
 
