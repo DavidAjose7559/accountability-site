@@ -10,12 +10,11 @@ console.log("Script is running");
 let streak = localStorage.getItem('streak') ? parseInt(localStorage.getItem('streak')) : 0;
 let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
 
-// Dummy leaderboard data (moved after streak initialization)
+// Dummy leaderboard data (excluding the User part, it will be dynamically updated)
 const leaderboardData = [
     { name: 'John Doe', streak: 5 },
     { name: 'Jane Smith', streak: 7 },
-    { name: 'Mark Johnson', streak: 3 },
-    { name: 'User', streak: streak }  // Now streak is initialized
+    { name: 'Mark Johnson', streak: 3 }
 ];
 
 // Handle user registration and save to Firestore
@@ -41,6 +40,8 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('leaderboard').style.display = 'block';
 
+        // Update leaderboard with the new user
+        leaderboardData.push({ name: userName, streak: 0 });
         updateUserStreak();
         updateLeaderboard();
 
@@ -82,8 +83,13 @@ window.onload = async function() {
                 const userData = userDoc.data();
                 streak = userData.streak || 0;
 
+                // Update welcome message
                 document.getElementById('welcomeMessage').classList.remove('hidden');
                 document.getElementById('leaderboard').style.display = 'block';
+
+                // Add the user to the leaderboard dynamically
+                leaderboardData.push({ name: userData.name, streak: userData.streak });
+
                 updateStreakMessage();
                 updateLeaderboard();
             } else {
@@ -96,18 +102,22 @@ window.onload = async function() {
     }
 };
 
-// Display the current streak to the user
+// Update streak message without creating new elements
 const updateStreakMessage = () => {
-    const streakMessage = document.createElement('p');
-    streakMessage.innerText = `Your current streak: ${streak} days`;
-    document.getElementById('welcomeMessage').appendChild(streakMessage);
+    const streakMessage = document.getElementById('streakMessage');
+    if (streakMessage) {
+        streakMessage.innerText = `Your current streak: ${streak} days`;
+    } else {
+        const newStreakMessage = document.createElement('p');
+        newStreakMessage.id = 'streakMessage';
+        newStreakMessage.innerText = `Your current streak: ${streak} days`;
+        document.getElementById('welcomeMessage').appendChild(newStreakMessage);
+    }
 };
-
-
 
 // Find and update user streak in leaderboard
 const updateUserStreak = () => {
-    const user = leaderboardData.find(user => user.name === 'User');
+    const user = leaderboardData.find(user => user.name === localStorage.getItem('userEmail'));
     if (user) {
         user.streak = streak;
         console.log('Updated user streak in leaderboard data:', user);
