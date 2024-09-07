@@ -12,6 +12,16 @@ console.log("Script is running");
 let streak = 0;
 let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
 
+// Show registration form and hide login form when "Create Account" is clicked
+document.getElementById('showRegisterButton').addEventListener('click', function() {
+    // Hide login form and the "Create Account" button
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
+    // Show registration form
+    document.getElementById('registrationForm').classList.remove('hidden');
+    document.getElementById('registrationForm').style.display = 'block';
+});
+
 // Handle user registration and save to Firestore
 document.getElementById('registrationForm').addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -44,6 +54,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
         // Hide registration form and show welcome message and leaderboard
         document.getElementById('registrationForm').style.display = 'none';
+        document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('leaderboard').style.display = 'block';
         document.getElementById('logoutButton').classList.remove('hidden');
@@ -85,6 +96,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
             // Show welcome message and leaderboard
             document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
             document.getElementById('welcomeMessage').classList.remove('hidden');
             document.getElementById('leaderboard').style.display = 'block';
             document.getElementById('logoutButton').classList.remove('hidden');
@@ -210,15 +222,6 @@ const updateStreakMessage = () => {
         document.getElementById('welcomeMessage').appendChild(newStreakMessage);
     }
 };
-
-// Show registration form and hide login form when "Create Account" is clicked
-document.getElementById('showRegisterButton').addEventListener('click', function() {
-    // Hide login form
-    document.getElementById('loginForm').style.display = 'none';
-    // Show registration form
-    document.getElementById('registrationForm').classList.remove('hidden');
-    document.getElementById('registrationForm').style.display = 'block';
-});
 
 
 // Check if streak should be reset
