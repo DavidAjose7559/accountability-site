@@ -23,7 +23,7 @@ document.getElementById('showRegisterButton').addEventListener('click', function
     document.getElementById('existingUserSection').style.display = 'block';
 
     // Hide leaderboard and welcome message
-   // document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
@@ -37,7 +37,7 @@ document.getElementById('showLoginButton').addEventListener('click', function() 
     document.getElementById('createAccountSection').style.display = 'block';
 
     // Hide leaderboard and welcome message
-   // document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
@@ -75,7 +75,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('createAccountSection').style.display = 'none';
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('logoutButton').classList.remove('hidden');
-        
+        document.getElementById('leaderboard').classList.remove('hidden'); 
 
         // Fetch the latest leaderboard from Firestore
         await fetchLeaderboard();
@@ -115,7 +115,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('createAccountSection').style.display = 'none';
             document.getElementById('welcomeMessage').classList.remove('hidden');
-            document.getElementById('leaderboard').classList.add('hidden'); 
+            document.getElementById('leaderboard').classList.remove('hidden'); 
             document.getElementById('logoutButton').classList.remove('hidden');
 
             updateStreakMessage();
