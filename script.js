@@ -6,6 +6,18 @@ const db = getFirestore();
 
 console.log("Script is running");
 
+// Initialize streak globally
+let streak = localStorage.getItem('streak') ? parseInt(localStorage.getItem('streak')) : 0;
+let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
+
+// Dummy leaderboard data (moved after streak initialization)
+const leaderboardData = [
+    { name: 'John Doe', streak: 5 },
+    { name: 'Jane Smith', streak: 7 },
+    { name: 'Mark Johnson', streak: 3 },
+    { name: 'User', streak: streak }  // Now streak is initialized
+];
+
 // Handle user registration and save to Firestore
 document.getElementById('registrationForm').addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -91,13 +103,7 @@ const updateStreakMessage = () => {
     document.getElementById('welcomeMessage').appendChild(streakMessage);
 };
 
-// Dummy leaderboard data
-const leaderboardData = [
-    { name: 'John Doe', streak: 5 },
-    { name: 'Jane Smith', streak: 7 },
-    { name: 'Mark Johnson', streak: 3 },
-    { name: 'User', streak: streak }
-];
+
 
 // Find and update user streak in leaderboard
 const updateUserStreak = () => {
