@@ -1,7 +1,7 @@
 // Firestore setup (using global Firebase namespace)
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-const db = firebase.firestore();
+const db = getFirestore();
 
 console.log("Script is running");
 
