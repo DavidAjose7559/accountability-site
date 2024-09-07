@@ -1,6 +1,7 @@
-// Firestore setup (using global Firebase namespace)
+// Import Firestore from Firebase module
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
+// Initialize Firestore
 const db = getFirestore();
 
 console.log("Script is running");
@@ -14,7 +15,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
     try {
         // Save user details and streak in Firestore
-        await db.collection('users').doc(userEmail).set({
+        await setDoc(doc(db, 'users', userEmail), {
             name: userName,
             email: userEmail,
             streak: 0 // Initial streak
@@ -37,8 +38,51 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     }
 });
 
-let streak = localStorage.getItem('streak') ? parseInt(localStorage.getItem('streak')) : 0;
-let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
+// Handle check-in and update streak in Firestore
+document.getElementById('checkInButton').addEventListener('click', async function() {
+    const userEmail = localStorage.getItem('userEmail');
+    streak += 1;
+
+    try {
+        // Update streak in Firestore
+        await updateDoc(doc(db, 'users', userEmail), { streak: streak });
+        console.log('User streak updated in Firestore');
+
+        updateUserStreak();
+        updateLeaderboard();
+
+        alert('Check-in successful! Your streak is now: ' + streak + ' days');
+
+    } catch (error) {
+        console.error('Error updating streak: ', error);
+        alert('Error checking in. Please try again later.');
+    }
+});
+
+// Fetch and display user data on page load
+window.onload = async function() {
+    const userEmail = localStorage.getItem('userEmail');
+
+    if (userEmail) {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', userEmail));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                streak = userData.streak || 0;
+
+                document.getElementById('welcomeMessage').classList.remove('hidden');
+                document.getElementById('leaderboard').style.display = 'block';
+                updateStreakMessage();
+                updateLeaderboard();
+            } else {
+                console.log('No such user found');
+            }
+        } catch (error) {
+            console.error('Error fetching user data: ', error);
+            alert('Error loading user data. Please try again later.');
+        }
+    }
+};
 
 // Display the current streak to the user
 const updateStreakMessage = () => {
@@ -46,29 +90,6 @@ const updateStreakMessage = () => {
     streakMessage.innerText = `Your current streak: ${streak} days`;
     document.getElementById('welcomeMessage').appendChild(streakMessage);
 };
-
-// Reset streak if a day is missed
-const resetStreak = () => {
-    streak = 0;
-    localStorage.setItem('streak', streak);
-    alert('You missed a day! Your streak has been reset to 0.');
-};
-
-// Check if streak should be reset
-const checkMissedDay = () => {
-    if (lastCheckIn) {
-        const today = new Date();
-        const differenceInTime = today.getTime() - lastCheckIn.getTime();
-        const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-
-        if (differenceInDays > 1) {
-            resetStreak();
-        }
-    }
-};
-
-checkMissedDay();
-updateStreakMessage();
 
 // Dummy leaderboard data
 const leaderboardData = [
@@ -107,48 +128,24 @@ const updateLeaderboard = () => {
     console.log('Leaderboard updated');
 };
 
-// Handle check-in and update streak in Firestore
-document.getElementById('checkInButton').addEventListener('click', async function() {
-    const userEmail = localStorage.getItem('userEmail');
-    streak += 1;
+// Check if streak should be reset
+const resetStreak = () => {
+    streak = 0;
+    localStorage.setItem('streak', streak);
+    alert('You missed a day! Your streak has been reset to 0.');
+};
 
-    try {
-        // Update streak in Firestore
-        await db.collection('users').doc(userEmail).update({ streak: streak });
-        console.log('User streak updated in Firestore');
-
-        updateUserStreak();
-        updateLeaderboard();
-
-        alert('Check-in successful! Your streak is now: ' + streak + ' days');
-
-    } catch (error) {
-        console.error('Error updating streak: ', error);
-        alert('Error checking in. Please try again later.');
-    }
-});
-
-// Fetch and display user data on page load
-window.onload = async function() {
-    const userEmail = localStorage.getItem('userEmail');
-
-    if (userEmail) {
-        try {
-            const userDoc = await db.collection('users').doc(userEmail).get();
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                streak = userData.streak || 0;
-
-                document.getElementById('welcomeMessage').classList.remove('hidden');
-                document.getElementById('leaderboard').style.display = 'block';
-                updateStreakMessage();
-                updateLeaderboard();
-            } else {
-                console.log('No such user found');
-            }
-        } catch (error) {
-            console.error('Error fetching user data: ', error);
-            alert('Error loading user data. Please try again later.');
+const checkMissedDay = () => {
+    const lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
+    if (lastCheckIn) {
+        const today = new Date();
+        const differenceInTime = today.getTime() - lastCheckIn.getTime();
+        const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+        if (differenceInDays > 1) {
+            resetStreak();
         }
     }
 };
+
+checkMissedDay();
+updateStreakMessage();
