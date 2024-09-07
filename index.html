@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountability Challenge</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Join the Accountability Challenge</h1>
+        
+        <!-- Registration Form -->
+        <form id="registrationForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <button type="submit">Register</button>
+        </form>
+
+        <!-- Welcome Message (initially hidden) -->
+        <div id="welcomeMessage" class="hidden">
+            <h2>Welcome to the Challenge!</h2>
+            <p>You are now registered for the 7-Day Bible and Prayer challenge. Check in daily to track your progress.</p>
+            <button id="checkInButton">Check In for Today</button>
+            <!-- Streak information will be added here dynamically by JavaScript -->
+        </div>
+        
+        <!-- Leaderboard -->
+        <div id="leaderboard">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboardList">
+                <!-- Leaderboard will be populated by JavaScript -->
+            </ul>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyApMjtqJ-ziZ7--rx4ARX4X_n1R1jAlj2k",
+          authDomain: "accountability-4c8e0.firebaseapp.com",
+          projectId: "accountability-4c8e0",
+          storageBucket: "accountability-4c8e0.appspot.com",
+          messagingSenderId: "561305839090",
+          appId: "1:561305839090:web:a3ae9b29b28dfe25dbf76b",
+          measurementId: "G-48DHRPRYJ9"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+
+    <!-- Load script.js after Firebase is fully loaded -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
