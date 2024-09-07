@@ -23,7 +23,7 @@ document.getElementById('showRegisterButton').addEventListener('click', function
     document.getElementById('existingUserSection').style.display = 'block';
 
     // Hide leaderboard and welcome message
-    //document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
@@ -37,7 +37,7 @@ document.getElementById('showLoginButton').addEventListener('click', function() 
     document.getElementById('createAccountSection').style.display = 'block';
 
     // Hide leaderboard and welcome message
-   // document.getElementById('leaderboard').classList.add('hidden');
+    document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
