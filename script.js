@@ -87,18 +87,26 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     }
 });
 
-// Handle user login
+// Handle user login with "Remember Me" functionality
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const userEmail = document.getElementById('loginEmail').value;
     const userPassword = document.getElementById('loginPassword').value;
+    const rememberMe = document.getElementById('rememberMe').checked; // Get "Remember Me" status
 
     try {
+        // Set persistence based on the "Remember Me" checkbox
+        if (rememberMe) {
+            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Keep user logged in across sessions
+        } else {
+            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); // Only keep logged in for the session
+        }
+
         // Sign in the user
         const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
         const user = userCredential.user;
-        
+
         console.log('User logged in successfully');
 
         // Fetch user streak from Firestore and show welcome message
@@ -124,7 +132,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         alert('Error logging in. Please check your credentials.');
     }
 });
-
 // Handle user logout
 document.getElementById('logoutButton').addEventListener('click', async function() {
     try {
