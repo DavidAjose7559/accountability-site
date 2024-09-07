@@ -8,41 +8,38 @@ const auth = getAuth();
 
 console.log("Script is running");
 
-// Initialize streak globally, but it will be updated after check-in
+// Initialize streak globally
 let streak = 0;
-let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
 
-// Show registration form and hide login form when "Create Account" is clicked
+// Handle "Create Account" button click
 document.getElementById('showRegisterButton').addEventListener('click', function() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('createAccountSection').style.display = 'none';
-    
-    // Show registration form and the "Existing User? Login" button
+
+    // Show registration form and "Existing User? Login" button
     document.getElementById('registrationForm').classList.remove('hidden');
     document.getElementById('registrationForm').style.display = 'block';
-    document.getElementById('existingUserSection').classList.remove('hidden'); // Ensure this shows
+    document.getElementById('existingUserSection').classList.remove('hidden');
     document.getElementById('existingUserSection').style.display = 'block';
 
-    // Ensure the leaderboard and welcome message are hidden during registration
+    // Hide leaderboard and welcome message
     document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
 
-// Show login form and hide registration form when "Login" button is clicked
+// Handle "Login" button click
 document.getElementById('showLoginButton').addEventListener('click', function() {
     document.getElementById('registrationForm').style.display = 'none';
     document.getElementById('existingUserSection').style.display = 'none';
-    
+
     // Show login form and "Create Account" button
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('createAccountSection').style.display = 'block';
 
-    // Ensure the leaderboard and welcome message are hidden during login
+    // Hide leaderboard and welcome message
     document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
-
-
 
 // Handle user registration and save to Firestore
 document.getElementById('registrationForm').addEventListener('submit', async function(event) {
@@ -58,7 +55,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         return; // Exit the function if the password is too short
     }
 
-   try {
+    try {
         // Create user with email and password
         const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
         const user = userCredential.user;
@@ -67,47 +64,45 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         await setDoc(doc(db, 'users', userEmail), {
             name: userName,
             email: userEmail,
-            streak: 0 // Initial streak is 0
+            streak: 0
         });
-
 
         console.log('User registered successfully with streak 0');
         localStorage.setItem('userEmail', userEmail);
 
         // Hide registration form and show welcome message and leaderboard
         document.getElementById('registrationForm').style.display = 'none';
-        document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
+        document.getElementById('createAccountSection').style.display = 'none';
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('logoutButton').classList.remove('hidden');
-        document.getElementById('leaderboard').classList.add('hidden'); 
+        document.getElementById('leaderboard').classList.remove('hidden');
 
         // Fetch the latest leaderboard from Firestore
         await fetchLeaderboard();
 
-        // Set streak message to 0 since it's a new registration
+        // Set streak message to 0
         streak = 0;
         updateStreakMessage();
-
     } catch (error) {
-        console.error('Error saving user data: ', error);
+        console.error('Error registering user: ', error.message);
         alert('Error registering user. Please try again later.');
     }
 });
 
 // Handle user login with "Remember Me" functionality
-// Handle user login
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const userEmail = document.getElementById('loginEmail').value;
     const userPassword = document.getElementById('loginPassword').value;
-    const rememberMe = document.getElementById('rememberMe').checked; 
+    const rememberMe = document.getElementById('rememberMe').checked;
 
     try {
+        // Set persistence based on the "Remember Me" checkbox
         if (rememberMe) {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
+            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Keep user logged in across sessions
         } else {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); // Only keep logged in for the session
         }
 
         const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
@@ -125,27 +120,30 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             // Hide login form and show welcome message and leaderboard
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('createAccountSection').style.display = 'none';
-            document.getElementById('welcomeMessage').classList.remove('hidden'); // Show welcome message
-            document.getElementById('leaderboard').classList.remove('hidden'); // Show leaderboard
+            document.getElementById('welcomeMessage').classList.remove('hidden');
+            document.getElementById('leaderboard').classList.remove('hidden');
             document.getElementById('logoutButton').classList.remove('hidden');
 
             updateStreakMessage();
             await fetchLeaderboard();
+        } else {
+            console.error('User data not found in Firestore');
         }
     } catch (error) {
-        console.error('Error logging in:', error);
+        console.error('Error logging in: ', error.message);
         alert('Error logging in. Please check your credentials.');
     }
 });
+
 // Handle user logout
 document.getElementById('logoutButton').addEventListener('click', async function() {
     try {
         await signOut(auth);
         console.log('User logged out successfully');
-        
+
         // Hide welcome message and leaderboard, show login form
         document.getElementById('welcomeMessage').classList.add('hidden');
-        document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard on logout
+        document.getElementById('leaderboard').classList.add('hidden');
         document.getElementById('logoutButton').classList.add('hidden');
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('createAccountSection').style.display = 'block';
@@ -153,36 +151,6 @@ document.getElementById('logoutButton').addEventListener('click', async function
         localStorage.removeItem('userEmail');
     } catch (error) {
         console.error('Error logging out:', error);
-    }
-});
-
-// Handle check-in and update streak in Firestore
-document.getElementById('checkInButton').addEventListener('click', async function() {
-    const userEmail = localStorage.getItem('userEmail');
-
-    try {
-        // Fetch current streak from Firestore, increment, and update it
-        const userDoc = await getDoc(doc(db, 'users', userEmail));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            streak = userData.streak + 1; // Increment streak
-
-            // Update streak in Firestore
-            await updateDoc(doc(db, 'users', userEmail), { streak: streak });
-            console.log('User streak updated in Firestore');
-
-            // Update the leaderboard and streak message
-            await fetchLeaderboard();
-            updateStreakMessage();
-
-            alert('Check-in successful! Your streak is now: ' + streak + ' days');
-        } else {
-            console.log('User not found in Firestore');
-        }
-
-    } catch (error) {
-        console.error('Error updating streak: ', error);
-        alert('Error checking in. Please try again later.');
     }
 });
 
@@ -194,7 +162,6 @@ window.onload = async function() {
         try {
             await fetchLeaderboard();
 
-            // Since this is page load, we don't need to fetch streak unless it's for display purposes
             const userDoc = await getDoc(doc(db, 'users', userEmail));
             if (userDoc.exists()) {
                 const userData = userDoc.data();
@@ -202,11 +169,11 @@ window.onload = async function() {
 
                 updateStreakMessage();
                 document.getElementById('welcomeMessage').classList.remove('hidden');
-                document.getElementById('leaderboard').style.display = 'block';
+                document.getElementById('leaderboard').classList.remove('hidden');
+                document.getElementById('logoutButton').classList.remove('hidden');
             }
         } catch (error) {
-            console.error('Error loading user data: ', error);
-            alert('Error loading user data. Please try again later.');
+            console.error('Error loading user data:', error.message);
         }
     }
 };
@@ -225,8 +192,7 @@ const fetchLeaderboard = async () => {
         leaderboardData.push({ name: userData.name, streak: userData.streak });
     });
 
-    // Sort leaderboard based on streak
-    leaderboardData.sort((a, b) => b.streak - a.streak);
+    leaderboardData.sort((a, b) => b.streak - a.streak); // Sort by streak
 
     leaderboardData.forEach(user => {
         const listItem = document.createElement('li');
@@ -238,7 +204,7 @@ const fetchLeaderboard = async () => {
     console.log('Leaderboard updated');
 };
 
-// Update streak message without creating new elements
+// Update streak message
 const updateStreakMessage = () => {
     const streakMessage = document.getElementById('streakMessage');
     if (streakMessage) {
@@ -250,26 +216,3 @@ const updateStreakMessage = () => {
         document.getElementById('welcomeMessage').appendChild(newStreakMessage);
     }
 };
-
-
-// Check if streak should be reset
-const resetStreak = () => {
-    streak = 0;
-    localStorage.setItem('streak', streak);
-    alert('You missed a day! Your streak has been reset to 0.');
-};
-
-const checkMissedDay = () => {
-    const lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
-    if (lastCheckIn) {
-        const today = new Date();
-        const differenceInTime = today.getTime() - lastCheckIn.getTime();
-        const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-        if (differenceInDays > 1) {
-            resetStreak();
-        }
-    }
-};
-
-checkMissedDay();
-updateStreakMessage();
