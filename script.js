@@ -17,10 +17,12 @@ document.getElementById('showRegisterButton').addEventListener('click', function
     // Hide login form and "Create Account" section
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('createAccountSection').style.display = 'none';
+    
     // Show registration form and "Existing User? Login" button
     document.getElementById('registrationForm').classList.remove('hidden');
     document.getElementById('registrationForm').style.display = 'block';
     document.getElementById('existingUserSection').classList.remove('hidden');
+    document.getElementById('existingUserSection').style.display = 'block'; // Ensure it's shown
 });
 
 // Show login form and hide registration form when "Login" button is clicked
@@ -28,10 +30,12 @@ document.getElementById('showLoginButton').addEventListener('click', function() 
     // Hide registration form and "Existing User? Login" section
     document.getElementById('registrationForm').style.display = 'none';
     document.getElementById('existingUserSection').style.display = 'none';
+    
     // Show login form and "Create Account" button
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('createAccountSection').style.display = 'block';
 });
+
 
 // Handle user registration and save to Firestore
 document.getElementById('registrationForm').addEventListener('submit', async function(event) {
