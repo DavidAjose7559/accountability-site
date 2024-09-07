@@ -14,22 +14,24 @@ let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.ge
 
 // Show registration form and hide login form when "Create Account" is clicked
 document.getElementById('showRegisterButton').addEventListener('click', function() {
-    // Hide login form and "Create Account" section
+    // Hide login form, leaderboard, and "Create Account" section
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('createAccountSection').style.display = 'none';
+    document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard
     
     // Show registration form and "Existing User? Login" button
     document.getElementById('registrationForm').classList.remove('hidden');
     document.getElementById('registrationForm').style.display = 'block';
     document.getElementById('existingUserSection').classList.remove('hidden');
-    document.getElementById('existingUserSection').style.display = 'block'; // Ensure it's shown
+    document.getElementById('existingUserSection').style.display = 'block';
 });
 
 // Show login form and hide registration form when "Login" button is clicked
 document.getElementById('showLoginButton').addEventListener('click', function() {
-    // Hide registration form and "Existing User? Login" section
+    // Hide registration form, leaderboard, and "Existing User? Login" section
     document.getElementById('registrationForm').style.display = 'none';
     document.getElementById('existingUserSection').style.display = 'none';
+    document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard
     
     // Show login form and "Create Account" button
     document.getElementById('loginForm').style.display = 'block';
@@ -121,7 +123,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
             document.getElementById('welcomeMessage').classList.remove('hidden');
-            document.getElementById('leaderboard').classList.add('hidden'); 
+            document.getElementById('leaderboard').classList.remove('hidden'); // Show leaderboard
             document.getElementById('logoutButton').classList.remove('hidden');
 
             updateStreakMessage();
