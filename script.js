@@ -16,8 +16,12 @@ let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.ge
 document.getElementById('showRegisterButton').addEventListener('click', function() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('createAccountSection').style.display = 'none';
+    
+    // Show registration form and the "Existing User? Login" button
     document.getElementById('registrationForm').classList.remove('hidden');
     document.getElementById('registrationForm').style.display = 'block';
+    document.getElementById('existingUserSection').classList.remove('hidden'); // Ensure this shows
+    document.getElementById('existingUserSection').style.display = 'block';
 
     // Ensure the leaderboard and welcome message are hidden during registration
     document.getElementById('leaderboard').classList.add('hidden');
@@ -28,6 +32,8 @@ document.getElementById('showRegisterButton').addEventListener('click', function
 document.getElementById('showLoginButton').addEventListener('click', function() {
     document.getElementById('registrationForm').style.display = 'none';
     document.getElementById('existingUserSection').style.display = 'none';
+    
+    // Show login form and "Create Account" button
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('createAccountSection').style.display = 'block';
 
@@ -35,6 +41,7 @@ document.getElementById('showLoginButton').addEventListener('click', function() 
     document.getElementById('leaderboard').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
 });
+
 
 
 // Handle user registration and save to Firestore
