@@ -207,9 +207,13 @@ const updateStreakMessage = () => {
 
 // Show registration form and hide login form when "Create Account" is clicked
 document.getElementById('showRegisterButton').addEventListener('click', function() {
+    // Hide login form
     document.getElementById('loginForm').style.display = 'none';
+    // Show registration form
     document.getElementById('registrationForm').classList.remove('hidden');
+    document.getElementById('registrationForm').style.display = 'block';
 });
+
 
 // Check if streak should be reset
 const resetStreak = () => {
