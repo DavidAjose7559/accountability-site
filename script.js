@@ -34,11 +34,10 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('leaderboard').style.display = 'block';
 
         // Fetch the latest leaderboard and user streak from Firestore
-        await fetchLeaderboard();
-        await fetchUserData(userEmail);
+        await fetchLeaderboard();  // Update the leaderboard
+        await fetchUserData(userEmail);  // Fetch user data from Firestore
 
         updateStreakMessage();
-        updateLeaderboard();
 
     } catch (error) {
         console.error('Error saving user data: ', error);
@@ -56,9 +55,10 @@ document.getElementById('checkInButton').addEventListener('click', async functio
         await updateDoc(doc(db, 'users', userEmail), { streak: streak });
         console.log('User streak updated in Firestore');
 
-        await fetchUserData(userEmail);
+        await fetchUserData(userEmail);  // Fetch updated user data
+        await fetchLeaderboard();  // Update the leaderboard with the latest data
+
         updateStreakMessage();
-        updateLeaderboard();
 
         alert('Check-in successful! Your streak is now: ' + streak + ' days');
 
@@ -74,12 +74,10 @@ window.onload = async function() {
 
     if (userEmail) {
         try {
-            await fetchUserData(userEmail);
-            await fetchLeaderboard();
+            await fetchUserData(userEmail);  // Fetch user data on load
+            await fetchLeaderboard();  // Fetch leaderboard on load
 
             updateStreakMessage();
-            updateLeaderboard();
-
             document.getElementById('welcomeMessage').classList.remove('hidden');
             document.getElementById('leaderboard').style.display = 'block';
 
