@@ -1,5 +1,5 @@
 // Import Firestore from Firebase module
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 // Initialize Firestore
@@ -98,13 +98,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const rememberMe = document.getElementById('rememberMe').checked;
 
     try {
-        // Set persistence based on the "Remember Me" checkbox
-        if (rememberMe) {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Keep user logged in across sessions
-        } else {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); // Only keep logged in for the session
-        }
-
+        // Sign in the user
         const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
         const user = userCredential.user;
 
