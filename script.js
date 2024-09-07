@@ -133,9 +133,10 @@ document.getElementById('logoutButton').addEventListener('click', async function
         
         // Hide welcome message and leaderboard, show login form
         document.getElementById('welcomeMessage').classList.add('hidden');
-        document.getElementById('leaderboard').classList.add('hidden');
+        document.getElementById('leaderboard').classList.add('hidden'); // Hide leaderboard on logout
         document.getElementById('logoutButton').classList.add('hidden');
         document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('createAccountSection').style.display = 'block';
 
         localStorage.removeItem('userEmail');
     } catch (error) {
