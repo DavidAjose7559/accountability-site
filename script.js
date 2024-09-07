@@ -71,8 +71,8 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('registrationForm').style.display = 'none';
         document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
         document.getElementById('welcomeMessage').classList.remove('hidden');
-        document.getElementById('leaderboard').style.display = 'block';
         document.getElementById('logoutButton').classList.remove('hidden');
+        document.getElementById('leaderboard').classList.add('hidden'); 
 
         // Fetch the latest leaderboard from Firestore
         await fetchLeaderboard();
@@ -113,7 +113,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('createAccountSection').style.display = 'none'; // Hide this section
             document.getElementById('welcomeMessage').classList.remove('hidden');
-            document.getElementById('leaderboard').style.display = 'block';
+            document.getElementById('leaderboard').classList.add('hidden'); 
             document.getElementById('logoutButton').classList.remove('hidden');
 
             updateStreakMessage();
