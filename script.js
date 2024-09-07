@@ -1,8 +1,10 @@
 // Import Firestore from Firebase module
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 // Initialize Firestore
 const db = getFirestore();
+const auth = getAuth();
 
 console.log("Script is running");
 
@@ -16,14 +18,20 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
     const userName = document.getElementById('name').value;
     const userEmail = document.getElementById('email').value;
+    const userPassword = document.getElementById('password').value;
 
-    try {
+   try {
+        // Create user with email and password
+        const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
+        const user = userCredential.user;
+
         // Save user details and initialize streak to 0 in Firestore
         await setDoc(doc(db, 'users', userEmail), {
             name: userName,
             email: userEmail,
             streak: 0 // Initial streak is 0
         });
+
 
         console.log('User registered successfully with streak 0');
         localStorage.setItem('userEmail', userEmail);
@@ -32,6 +40,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('registrationForm').style.display = 'none';
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('leaderboard').style.display = 'block';
+        document.getElementById('logoutButton').classList.remove('hidden');
 
         // Fetch the latest leaderboard from Firestore
         await fetchLeaderboard();
@@ -43,6 +52,61 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     } catch (error) {
         console.error('Error saving user data: ', error);
         alert('Error registering user. Please try again later.');
+    }
+});
+
+// Handle user login
+document.getElementById('loginForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const userEmail = document.getElementById('loginEmail').value;
+    const userPassword = document.getElementById('loginPassword').value;
+
+    try {
+        // Sign in the user
+        const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
+        const user = userCredential.user;
+        
+        console.log('User logged in successfully');
+
+        // Fetch user streak from Firestore and show welcome message
+        const userDoc = await getDoc(doc(db, 'users', userEmail));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            streak = userData.streak;
+
+            localStorage.setItem('userEmail', userEmail);
+
+            // Show welcome message and leaderboard
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('welcomeMessage').classList.remove('hidden');
+            document.getElementById('leaderboard').style.display = 'block';
+            document.getElementById('logoutButton').classList.remove('hidden');
+
+            updateStreakMessage();
+            await fetchLeaderboard();
+        }
+    } catch (error) {
+        console.error('Error logging in:', error);
+        alert('Error logging in. Please check your credentials.');
+    }
+});
+
+// Handle user logout
+document.getElementById('logoutButton').addEventListener('click', async function() {
+    try {
+        await signOut(auth);
+        console.log('User logged out successfully');
+        
+        // Hide welcome message and leaderboard, show login form
+        document.getElementById('welcomeMessage').classList.add('hidden');
+        document.getElementById('leaderboard').classList.add('hidden');
+        document.getElementById('logoutButton').classList.add('hidden');
+        document.getElementById('loginForm').style.display = 'block';
+
+        localStorage.removeItem('userEmail');
+    } catch (error) {
+        console.error('Error logging out:', error);
     }
 });
 
