@@ -45,18 +45,20 @@
        <!-- Create Account Button -->
         <p id="createAccountSection">Don't have an account? <button id="showRegisterButton">Create Account</button></p>
 
-        <!-- Welcome Message (initially hidden) -->
+        <!-- Welcome Message (Initially hidden) -->
         <div id="welcomeMessage" class="hidden">
             <h2>Welcome to the Challenge!</h2>
             <p>You are now registered for the 7-Day Bible and Prayer challenge. Check in daily to track your progress.</p>
             <button id="checkInButton">Check In for Today</button>
-            <!-- Streak information will be added here dynamically by JavaScript -->
+            <p id="streakMessage">Your current streak: 0 days</p>
         </div>
-
-        <!-- Leaderboard -->
+        
+        <!-- Leaderboard (Initially hidden) -->
         <div id="leaderboard" class="hidden">
             <h3>Leaderboard</h3>
-            <ul id="leaderboardList"></ul>
+            <ul id="leaderboardList">
+                <!-- Leaderboard data will be populated here -->
+            </ul>
         </div>
 
         <!-- Logout Button -->
