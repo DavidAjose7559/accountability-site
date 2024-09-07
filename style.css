@@ -86,3 +86,16 @@ button:hover {
     border-radius: 4px;
     text-align: left;
 }
+
+#showRegisterButton {
+    background-color: transparent;
+    border: none;
+    color: #5cb85c;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#showRegisterButton:hover {
+    color: #4cae4c;
+}
+
