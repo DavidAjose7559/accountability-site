@@ -6,8 +6,8 @@ const db = getFirestore();
 
 console.log("Script is running");
 
-// Initialize streak globally
-let streak = localStorage.getItem('streak') ? parseInt(localStorage.getItem('streak')) : 0;
+// Initialize streak globally, but it will be updated with Firestore data
+let streak = 0;
 let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
 
 // Dummy leaderboard data (excluding the User part, it will be dynamically updated)
@@ -42,8 +42,8 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
         // Update leaderboard with the new user
         leaderboardData.push({ name: userName, streak: 0 });
-        updateUserStreak();
         updateLeaderboard();
+        updateStreakMessage();
 
     } catch (error) {
         console.error('Error saving user data: ', error);
@@ -61,8 +61,8 @@ document.getElementById('checkInButton').addEventListener('click', async functio
         await updateDoc(doc(db, 'users', userEmail), { streak: streak });
         console.log('User streak updated in Firestore');
 
-        updateUserStreak();
         updateLeaderboard();
+        updateStreakMessage();
 
         alert('Check-in successful! Your streak is now: ' + streak + ' days');
 
@@ -115,23 +115,14 @@ const updateStreakMessage = () => {
     }
 };
 
-// Find and update user streak in leaderboard
-const updateUserStreak = () => {
-    const user = leaderboardData.find(user => user.name === localStorage.getItem('userEmail'));
-    if (user) {
-        user.streak = streak;
-        console.log('Updated user streak in leaderboard data:', user);
-    } else {
-        console.log('User not found in leaderboard data');
-    }
-};
-
-const updateLeaderboard = () => {
+// Update leaderboard
+const updateLeaderboard = async () => {
     const leaderboardList = document.getElementById('leaderboardList');
     leaderboardList.innerHTML = '';
 
     console.log('Updating leaderboard', leaderboardData);
 
+    // Update leaderboard based on streak values
     leaderboardData.sort((a, b) => b.streak - a.streak);
 
     leaderboardData.forEach(user => {
