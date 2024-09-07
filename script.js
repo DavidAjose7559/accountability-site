@@ -6,7 +6,7 @@ const db = getFirestore();
 
 console.log("Script is running");
 
-// Initialize streak globally, but it will be updated with Firestore data
+// Initialize streak globally, but it will be updated after check-in
 let streak = 0;
 let lastCheckIn = localStorage.getItem('lastCheckIn') ? new Date(localStorage.getItem('lastCheckIn')) : null;
 
@@ -18,14 +18,14 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     const userEmail = document.getElementById('email').value;
 
     try {
-        // Save user details and streak in Firestore
+        // Save user details and initialize streak to 0 in Firestore
         await setDoc(doc(db, 'users', userEmail), {
             name: userName,
             email: userEmail,
-            streak: 0 // Initial streak
+            streak: 0 // Initial streak is 0
         });
 
-        console.log('User data saved to Firestore');
+        console.log('User registered successfully with streak 0');
         localStorage.setItem('userEmail', userEmail);
 
         // Hide registration form and show welcome message and leaderboard
@@ -33,10 +33,11 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         document.getElementById('welcomeMessage').classList.remove('hidden');
         document.getElementById('leaderboard').style.display = 'block';
 
-        // Fetch the latest leaderboard and user streak from Firestore
-        await fetchLeaderboard();  // Update the leaderboard
-        await fetchUserData(userEmail);  // Fetch user data from Firestore
+        // Fetch the latest leaderboard from Firestore
+        await fetchLeaderboard();
 
+        // Set streak message to 0 since it's a new registration
+        streak = 0;
         updateStreakMessage();
 
     } catch (error) {
@@ -48,19 +49,26 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 // Handle check-in and update streak in Firestore
 document.getElementById('checkInButton').addEventListener('click', async function() {
     const userEmail = localStorage.getItem('userEmail');
-    streak += 1;
 
     try {
-        // Update streak in Firestore
-        await updateDoc(doc(db, 'users', userEmail), { streak: streak });
-        console.log('User streak updated in Firestore');
+        // Fetch current streak from Firestore, increment, and update it
+        const userDoc = await getDoc(doc(db, 'users', userEmail));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            streak = userData.streak + 1; // Increment streak
 
-        await fetchUserData(userEmail);  // Fetch updated user data
-        await fetchLeaderboard();  // Update the leaderboard with the latest data
+            // Update streak in Firestore
+            await updateDoc(doc(db, 'users', userEmail), { streak: streak });
+            console.log('User streak updated in Firestore');
 
-        updateStreakMessage();
+            // Update the leaderboard and streak message
+            await fetchLeaderboard();
+            updateStreakMessage();
 
-        alert('Check-in successful! Your streak is now: ' + streak + ' days');
+            alert('Check-in successful! Your streak is now: ' + streak + ' days');
+        } else {
+            console.log('User not found in Firestore');
+        }
 
     } catch (error) {
         console.error('Error updating streak: ', error);
@@ -74,29 +82,22 @@ window.onload = async function() {
 
     if (userEmail) {
         try {
-            await fetchUserData(userEmail);  // Fetch user data on load
-            await fetchLeaderboard();  // Fetch leaderboard on load
+            await fetchLeaderboard();
 
-            updateStreakMessage();
-            document.getElementById('welcomeMessage').classList.remove('hidden');
-            document.getElementById('leaderboard').style.display = 'block';
+            // Since this is page load, we don't need to fetch streak unless it's for display purposes
+            const userDoc = await getDoc(doc(db, 'users', userEmail));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                streak = userData.streak || 0;
 
+                updateStreakMessage();
+                document.getElementById('welcomeMessage').classList.remove('hidden');
+                document.getElementById('leaderboard').style.display = 'block';
+            }
         } catch (error) {
             console.error('Error loading user data: ', error);
             alert('Error loading user data. Please try again later.');
         }
-    }
-};
-
-// Function to fetch user data from Firestore
-const fetchUserData = async (userEmail) => {
-    const userDoc = await getDoc(doc(db, 'users', userEmail));
-    if (userDoc.exists()) {
-        const userData = userDoc.data();
-        streak = userData.streak || 0;
-        console.log(`User data:`, userData);
-    } else {
-        console.log('No such user found');
     }
 };
 
