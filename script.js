@@ -20,6 +20,12 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     const userEmail = document.getElementById('email').value;
     const userPassword = document.getElementById('password').value;
 
+    // Check if the password meets the minimum length requirement
+    if (userPassword.length < 6) {
+        alert('Password should be at least 6 characters long.');
+        return; // Exit the function if the password is too short
+    }
+
    try {
         // Create user with email and password
         const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
